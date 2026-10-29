@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Conversation width">
+  <title>Conversation width</title>
+  <g fill="none" stroke="#247bbf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 会话内容列 -->
+    <rect x="24" y="8" width="16" height="23" rx="3"/>
+    <!-- 向左右加宽 -->
+    <path d="M22 19 H9"/>
+    <path d="M15 12 L8 19 L15 26"/>
+    <path d="M42 19 H55"/>
+    <path d="M49 12 L56 19 L49 26"/>
+    <!-- 输入框下方的宽度滑杆（把手偏右 = 更宽） -->
+    <path d="M12 47 H52"/>
+    <rect x="34" y="40" width="9" height="14" rx="4.5" fill="#247bbf" stroke="none"/>
+  </g>
+</svg>

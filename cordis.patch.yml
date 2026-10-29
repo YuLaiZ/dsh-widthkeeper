@@ -1,0 +1,7 @@
+# Bundle patch：在 profile 上插入一行。
+# 行名从 profile 自己的 node_modules 解析，那里由插件页的「添加插件」
+# 或 `dsh plugin --profile <name> add <spec>` 安装本包。
+# Host 半边是空实现，功能在 Client 半边（package.json 的 `dsh.client` 声明）。
+- insert:
+    - id: widthkeeper
+      name: 'dsh-widthkeeper'
