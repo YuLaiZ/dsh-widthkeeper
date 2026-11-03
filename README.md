@@ -13,6 +13,10 @@
 
 范围只限主会话：右侧栏子会话（ui-subagent 的 sidebar chat）有宿主自己的响应式宽度，插件不接管、也不在其中显示控件。
 
+## 变更记录
+
+各版本的变更与升级影响见 [CHANGELOG](https://github.com/YuLaiZ/dsh-widthkeeper/blob/main/CHANGELOG.md)。
+
 ## 为什么需要它
 
 Harness 内置的宽度手柄是一条悬停在正文列外侧才显形的 2px 竖线，热区 10px、和内容列一样高，很容易误触；宽度默认由 `clamp(680px, 列宽 × 64%, 920px)` 这类公式给出，拖动后宿主会记住偏好，但拖动过程以列宽比例和边距为基准，想在常见窗口里稳定落到某个精确像素值只能反复试探。
