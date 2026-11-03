@@ -14,6 +14,7 @@
 - 偏好新增 `dsh.conversationWidth.dockVisible`（默认显示）；宿主的 `dsh.conversation.contentWidth` 仅读取用于来源判定。
 - 插件展示：图标改为官方插件蓝色渐变方块样式（双边界 + 双向箭头）；新增 `locale/zh.json` / `locale/en.json`，插件页标题「守宽人」、描述「精确调宽、自动读值，钉住即收」。
 - 兼容性：`engines.dsh` 从 `^0.2.0-rc.1` 放宽为 `>=0.2.0-rc.1`，0.3 及以上允许安装；实际兼容性以运行结果为准，宿主改版导致失效时在插件页关闭本插件即可。
+- npm 包名改为 `@yulaiz/dsh-widthkeeper`：插件页或命令行安装请使用 scoped 名；本地已用旧无 scope 名安装过的 profile 需先卸载再安装。
 - 文档与元数据：package.json 描述去掉「Fork of ...」声明，README 开篇改讲产品、来源移到末尾「来源与致谢」；安装说明新增「先禁用或卸载上游插件」的迁移提示（槽位 id、语言命名空间与偏好键沿用上游，同时启用会冲突）；安装说明修正，本地开发地址用 `link:`（`file:` 会进 `.pnpm` 副本，改源码不生效）；补充 Web 版与桌面版各自独立安装的方式；开发说明分别写清 Web 版刷新页面生效、桌面版需退出并重开，并补充主会话范围与 `[data-sidebar-chat]` 依赖。
 
 ## 0.1.0

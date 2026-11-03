@@ -4,4 +4,4 @@
 # Host 半边是空实现，功能在 Client 半边（package.json 的 `dsh.client` 声明）。
 - insert:
     - id: widthkeeper
-      name: 'dsh-widthkeeper'
+      name: '@yulaiz/dsh-widthkeeper'
