@@ -28,7 +28,7 @@ Harness 内置的宽度手柄是一条悬停在正文列外侧才显形的 2px �
 DSH 插件页「添加插件」：
 
 - 从 GitHub：`github:YuLaiZ/dsh-widthkeeper`
-- 从 npm（发布后）：`dsh-widthkeeper`
+- 从 npm：`dsh-widthkeeper`
 
 Web 版与桌面版各自独立安装，profile 互不相通：
 
