@@ -30,7 +30,7 @@
  * - 收起输入框下方的控件时，宽度规则继续生效，固定宽度不受影响。
  */
 window.__ModuleLoader__.load({
-  id: 'dsh-widthkeeper',
+  id: '@yulaiz/dsh-widthkeeper',
   factory(require) {
     const React = require('react')
     const h = React.createElement
@@ -47,9 +47,9 @@ window.__ModuleLoader__.load({
     } catch { /* 宿主未提供 primitives：不显示悬浮提示，控件仍可用 */ }
 
     /** 本插件占用的语言命名空间。 */
-    const NS = 'dsh-conversation-width'
+    const NS = 'dsh-widthkeeper'
     /** 槽位内的登记 id：新 id 与宿主条目并列，复用宿主 id 会顶掉它。 */
-    const DOCK_ID = 'conversation-width'
+    const DOCK_ID = 'dsh-widthkeeper'
     /** 槽位：输入框卡片下方的环境条目。 */
     const DOCK_SLOT = 'conversation.composer.dock'
     /** 槽位：设置页分区（宿主插件页 order 为 15，本分区排在其后）。 */
@@ -57,9 +57,9 @@ window.__ModuleLoader__.load({
     const SECTION_ID = 'widthkeeper'
     const SECTION_ORDER = 16
     /** 持久化偏好（按浏览器 profile，与 Harness 自己的宽度键同级）。 */
-    const ENABLED_KEY = 'dsh.conversationWidth.enabled'
-    const VALUE_KEY = 'dsh.conversationWidth.value'
-    const DOCK_VISIBLE_KEY = 'dsh.conversationWidth.dockVisible'
+    const ENABLED_KEY = 'dsh.widthkeeper.enabled'
+    const VALUE_KEY = 'dsh.widthkeeper.value'
+    const DOCK_VISIBLE_KEY = 'dsh.widthkeeper.dockVisible'
     /** 宿主内置拖拽偏好的键（只读，仅用于判定自动宽度的来源）。 */
     const HOST_WIDTH_KEY = 'dsh.conversation.contentWidth'
     /**
@@ -145,7 +145,7 @@ window.__ModuleLoader__.load({
      * secondary 字号、tabular-nums。只引用主题 token，token 改名只会掉样式，不会崩渲染。
      */
     const CHROME_CSS = [
-      '.cw-dock{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;',
+      '.wk-dock{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;',
       'padding:1px 8px;border-radius:var(--dsw-radius-sm);background:transparent;',
       // 字号与 ui-chat 的 StatsPills 一致：次级字号再减 1px
       'color:var(--dsw-alias-label-tertiary);',
@@ -155,32 +155,32 @@ window.__ModuleLoader__.load({
       // 自绘轨道与滑块：原生 accent-color 用的是品牌色，而品牌色在本设计系统里
       // 是黑白对比色（浅色主题近黑、深色主题近白），方块对撞过于生硬。这里改用
       // 中性灰调，滑杆是辅助控件，不需要抢过正文和数值的注意力。
-      '.cw-range{flex:0 1 auto;width:112px;min-width:56px;height:16px;margin:0;',
+      '.wk-range{flex:0 1 auto;width:112px;min-width:56px;height:16px;margin:0;',
       'background:transparent;cursor:pointer;-webkit-appearance:none;appearance:none}',
-      '.cw-range::-webkit-slider-runnable-track{height:4px;border-radius:999px;',
+      '.wk-range::-webkit-slider-runnable-track{height:4px;border-radius:999px;',
       'background:var(--dsw-alias-border-l3)}',
-      '.cw-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;',
+      '.wk-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;',
       'width:12px;height:12px;margin-top:-4px;border-radius:50%;',
       'background:var(--dsw-alias-label-secondary);transition:background .15s}',
-      '@media (hover: hover){.cw-range:hover::-webkit-slider-thumb{background:var(--dsw-alias-label-primary)}}',
-      '.cw-range:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}',
-      '.cw-dock[data-dsh-conversation-width="auto"] .cw-range{opacity:.55}',
+      '@media (hover: hover){.wk-range:hover::-webkit-slider-thumb{background:var(--dsw-alias-label-primary)}}',
+      '.wk-range:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}',
+      '.wk-dock[data-dsh-widthkeeper="auto"] .wk-range{opacity:.55}',
       // 静止态沿用宿主的 tertiary；只有 hover / 固定态才升到 secondary
-      '.cw-mode{flex:none;padding:0 6px;border:0;border-radius:var(--dsw-radius-sm);background:transparent;',
+      '.wk-mode{flex:none;padding:0 6px;border:0;border-radius:var(--dsw-radius-sm);background:transparent;',
       'color:var(--dsw-alias-label-tertiary);font:inherit;line-height:inherit;',
       'font-variant-numeric:tabular-nums;cursor:pointer}',
-      '.cw-mode[aria-pressed="true"]{color:var(--dsw-alias-label-secondary)}',
-      '.cw-mode:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}',
-      '.cw-mode:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}',
-      '.cw-edit{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0}',
-      '.cw-edit-input{flex:0 1 96px;min-width:56px;height:20px;margin:0;padding:0 6px;border:0;',
+      '.wk-mode[aria-pressed="true"]{color:var(--dsw-alias-label-secondary)}',
+      '.wk-mode:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-secondary)}',
+      '.wk-mode:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}',
+      '.wk-edit{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0}',
+      '.wk-edit-input{flex:0 1 96px;min-width:56px;height:20px;margin:0;padding:0 6px;border:0;',
       'border-radius:var(--dsw-radius-sm);background:var(--dsw-alias-interactive-bg-hover);',
       'color:var(--dsw-alias-label-primary);font:inherit;line-height:inherit;',
       'font-variant-numeric:tabular-nums;appearance:textfield}',
-      '.cw-edit-input::-webkit-outer-spin-button,.cw-edit-input::-webkit-inner-spin-button{',
+      '.wk-edit-input::-webkit-outer-spin-button,.wk-edit-input::-webkit-inner-spin-button{',
       '-webkit-appearance:none;margin:0}',
-      '.cw-edit-input:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}',
-      '.cw-edit-unit{flex:none;color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums}',
+      '.wk-edit-input:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}',
+      '.wk-edit-unit{flex:none;color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums}',
     ].join('')
 
     /**
@@ -189,39 +189,39 @@ window.__ModuleLoader__.load({
      * 原生 checkbox 配 brand accent。同样只引用主题 token。
      */
     const SECTION_CSS = [
-      '.cw-settings{display:flex;flex-direction:column;gap:16px;padding:8px 0;',
+      '.wk-settings{display:flex;flex-direction:column;gap:16px;padding:8px 0;',
       'font-size:13px;line-height:22px;color:var(--dsw-alias-label-primary)}',
-      '.cw-card{display:flex;flex-direction:column;padding:12px 16px;',
+      '.wk-card{display:flex;flex-direction:column;padding:12px 16px;',
       'border:0.5px solid var(--dsw-alias-settings-card-stroke);border-radius:var(--dsw-radius-xl);',
       'background:var(--dsw-alias-settings-card-fill)}',
-      '.cw-row{display:flex;align-items:center;justify-content:space-between;gap:16px;',
+      '.wk-row{display:flex;align-items:center;justify-content:space-between;gap:16px;',
       'min-height:40px;padding:6px 0;box-sizing:border-box}',
-      '.cw-row-copy{display:flex;flex-direction:column;min-width:0}',
-      '.cw-hint{font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary)}',
-      '.cw-divider{border-top:0.5px solid var(--dsw-alias-border-l2)}',
-      '.cw-row input[type="checkbox"]{flex:0 0 auto;width:16px;height:16px;margin:0;',
+      '.wk-row-copy{display:flex;flex-direction:column;min-width:0}',
+      '.wk-hint{font-size:12px;line-height:18px;color:var(--dsw-alias-label-tertiary)}',
+      '.wk-divider{border-top:0.5px solid var(--dsw-alias-border-l2)}',
+      '.wk-row input[type="checkbox"]{flex:0 0 auto;width:16px;height:16px;margin:0;',
       'accent-color:var(--dsw-alias-brand-primary);cursor:pointer}',
-      '.cw-field{display:inline-flex;align-items:center;gap:8px;flex:none}',
-      '.cw-num{box-sizing:border-box;width:96px;height:28px;padding:0 8px;',
+      '.wk-field{display:inline-flex;align-items:center;gap:8px;flex:none}',
+      '.wk-num{box-sizing:border-box;width:96px;height:28px;padding:0 8px;',
       'border:0.5px solid var(--dsw-alias-border-l3);border-radius:var(--dsw-radius-sm);',
       'background:transparent;color:var(--dsw-alias-label-primary);font:inherit;',
       'font-variant-numeric:tabular-nums;appearance:textfield}',
-      '.cw-num::-webkit-outer-spin-button,.cw-num::-webkit-inner-spin-button{',
+      '.wk-num::-webkit-outer-spin-button,.wk-num::-webkit-inner-spin-button{',
       '-webkit-appearance:none;margin:0}',
-      '.cw-num:disabled{opacity:.55;cursor:default}',
-      '.cw-unit{color:var(--dsw-alias-label-tertiary)}',
-      '.cw-ghost{display:inline-flex;align-items:center;box-sizing:border-box;height:28px;padding:0 10px;',
+      '.wk-num:disabled{opacity:.55;cursor:default}',
+      '.wk-unit{color:var(--dsw-alias-label-tertiary)}',
+      '.wk-ghost{display:inline-flex;align-items:center;box-sizing:border-box;height:28px;padding:0 10px;',
       'border:0.5px solid var(--dsw-alias-border-l3);border-radius:var(--dsw-radius-sm);',
       'background:transparent;color:var(--dsw-alias-label-primary);font-size:12px;line-height:20px;',
       'white-space:nowrap;cursor:pointer}',
-      '.cw-readonly{color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums;text-align:right}',
-      '.cw-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px}',
-      '.cw-btn{display:inline-flex;justify-content:center;align-items:center;box-sizing:border-box;',
+      '.wk-readonly{color:var(--dsw-alias-label-tertiary);font-variant-numeric:tabular-nums;text-align:right}',
+      '.wk-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px}',
+      '.wk-btn{display:inline-flex;justify-content:center;align-items:center;box-sizing:border-box;',
       'height:36px;min-width:58px;padding:0 14px;border:0.5px solid var(--dsw-alias-border-l3);',
       'border-radius:var(--dsw-radius-md);background:transparent;color:var(--dsw-alias-label-primary);',
       'font-size:14px;line-height:22px;white-space:nowrap;cursor:pointer}',
-      '@media (hover: hover){.cw-ghost:hover,.cw-btn:hover{background:var(--dsw-alias-interactive-bg-hover)}}',
-      '.cw-row input:focus-visible,.cw-num:focus-visible,.cw-ghost:focus-visible,.cw-btn:focus-visible{',
+      '@media (hover: hover){.wk-ghost:hover,.wk-btn:hover{background:var(--dsw-alias-interactive-bg-hover)}}',
+      '.wk-row input:focus-visible,.wk-num:focus-visible,.wk-ghost:focus-visible,.wk-btn:focus-visible{',
       'outline:var(--dsw-focus-ring-width) solid var(--dsw-focus-ring-color,var(--dsw-alias-state-business-primary));',
       'outline-offset:2px}',
     ].join('')
@@ -547,7 +547,7 @@ window.__ModuleLoader__.load({
           unsubscribe()
           tag.remove()
         }
-      }, 'widthkeeper: width axis stylesheet')
+      }, 'dsh-widthkeeper: width axis stylesheet')
     }
 
     /** 订阅共享 store 的本地镜像；dock 与设置页共用。 */
@@ -599,7 +599,6 @@ window.__ModuleLoader__.load({
          * 候选数量很少（通常只有一个主会话），集合按需增删。
          */
         const syncVisibilityObservers = () => {
-          if (typeof IntersectionObserver !== 'function') return
           const current = new Set(
             Array.from(document.querySelectorAll(CONTENT_SELECTOR))
               .filter((element) => !isEmbeddedContent(element)),
@@ -723,7 +722,7 @@ window.__ModuleLoader__.load({
       }
 
       return h('div', {
-        className: 'cw-edit',
+        className: 'wk-edit',
         ref: rootRef,
         onBlur: (event) => {
           // 焦点移出编辑层才提交；在层内移动焦点（如点到「使用自动宽度」）不触发
@@ -734,9 +733,9 @@ window.__ModuleLoader__.load({
       },
         h('input', {
           ref: inputRef,
-          className: 'cw-edit-input',
+          className: 'wk-edit-input',
           type: 'number',
-          name: 'dsh-conversation-width-exact',
+          name: 'dsh-widthkeeper-exact',
           inputMode: 'numeric',
           min: MIN,
           max: MAX,
@@ -749,9 +748,9 @@ window.__ModuleLoader__.load({
             else if (event.key === 'Escape') { event.preventDefault(); onClose() }
           },
         }),
-        h('span', { className: 'cw-edit-unit' }, 'px'),
+        h('span', { className: 'wk-edit-unit' }, 'px'),
         h('button', {
-          className: 'cw-mode',
+          className: 'wk-mode',
           type: 'button',
           // 抢在输入框失焦前拦截，避免先触发「失焦提交」
           onMouseDown: (event) => { event.preventDefault() },
@@ -814,7 +813,7 @@ window.__ModuleLoader__.load({
         ? t('pinnedTooltip')
         : (autoReadoutText(t, autoInfo) ?? t('autoTooltip'))
       const modeButton = h('button', {
-        className: 'cw-mode',
+        className: 'wk-mode',
         type: 'button',
         'aria-pressed': state.enabled,
         'aria-label': state.enabled
@@ -828,9 +827,9 @@ window.__ModuleLoader__.load({
       }, state.enabled ? state.value + 'px' : t('auto'))
       const sliderTitle = t('sliderTitle')
       const slider = h('input', {
-        className: 'cw-range',
+        className: 'wk-range',
         type: 'range',
-        name: 'dsh-conversation-width-slider',
+        name: 'dsh-widthkeeper-slider',
         min: MIN,
         max: MAX,
         step: STEP,
@@ -846,7 +845,7 @@ window.__ModuleLoader__.load({
 
       return state.dockVisible && !embedded ? h(React.Fragment, null,
         h('style', null, CHROME_CSS),
-        h('div', { ref: rootRef, className: 'cw-dock', 'data-dsh-conversation-width': mode },
+        h('div', { ref: rootRef, className: 'wk-dock', 'data-dsh-widthkeeper': mode },
           editing
             ? h(WidthValueEditor, { store, t, onClose: () => { setEditing(false) } })
             : h(React.Fragment, null,
@@ -897,29 +896,29 @@ window.__ModuleLoader__.load({
 
       return h(React.Fragment, null,
         h('style', null, SECTION_CSS),
-        h('section', { className: 'cw-settings', 'aria-label': t('settingsNav') },
-          h('div', { className: 'cw-card' },
-            h('label', { className: 'cw-row' },
+        h('section', { className: 'wk-settings', 'aria-label': t('settingsNav') },
+          h('div', { className: 'wk-card' },
+            h('label', { className: 'wk-row' },
               h('span', null, t('settingsDockToggle')),
               h('input', {
                 type: 'checkbox',
-                name: 'dsh-conversation-width-dock-visible',
+                name: 'dsh-widthkeeper-dock-visible',
                 checked: state.dockVisible,
                 onChange: (event) => { store.update({ dockVisible: event.target.checked }) },
               }),
             ),
-            h('div', { className: 'cw-divider' }),
-            h('div', { className: 'cw-row' },
-              h('div', { className: 'cw-row-copy' },
+            h('div', { className: 'wk-divider' }),
+            h('div', { className: 'wk-row' },
+              h('div', { className: 'wk-row-copy' },
                 h('span', null, isAuto ? t('settingsWidthLabelAuto') : t('settingsWidthLabel')),
-                h('span', { className: 'cw-hint' },
+                h('span', { className: 'wk-hint' },
                   isAuto ? t('settingsWidthHintAuto') : t('settingsWidthHint')),
               ),
-              h('div', { className: 'cw-field' },
+              h('div', { className: 'wk-field' },
                 h('input', {
-                  className: 'cw-num',
+                  className: 'wk-num',
                   type: 'number',
-                  name: 'dsh-conversation-width-value',
+                  name: 'dsh-widthkeeper-value',
                   inputMode: 'numeric',
                   min: MIN,
                   max: MAX,
@@ -939,24 +938,24 @@ window.__ModuleLoader__.load({
                   },
                   onBlur: commitDraft,
                 }),
-                h('span', { className: 'cw-unit' }, 'px'),
+                h('span', { className: 'wk-unit' }, 'px'),
                 h('button', {
-                  className: 'cw-ghost',
+                  className: 'wk-ghost',
                   type: 'button',
                   onClick: () => { store.update({ enabled: !store.get().enabled }) },
                 }, isAuto ? t('settingsPinnedSwitch') : t('useAuto')),
               ),
             ),
-            h('div', { className: 'cw-divider' }),
-            h('div', { className: 'cw-row' },
+            h('div', { className: 'wk-divider' }),
+            h('div', { className: 'wk-row' },
               h('span', null, t('settingsAutoRow')),
-              h('span', { className: 'cw-readonly' },
+              h('span', { className: 'wk-readonly' },
                 autoReadoutValue(t, autoInfo) ?? t(isAuto ? 'settingsAutoUnknown' : 'settingsAutoUnavailable')),
             ),
           ),
-          h('div', { className: 'cw-actions' },
+          h('div', { className: 'wk-actions' },
             wrapWithTooltip(t('settingsResetHint'), h('button', {
-              className: 'cw-btn',
+              className: 'wk-btn',
               type: 'button',
               onClick: () => { store.reset() },
             }, t('settingsReset')), 'end'),
@@ -968,6 +967,8 @@ window.__ModuleLoader__.load({
     return {
       inject: ['slots', 'locale'],
       apply(ctx) {
+        // 每次 activation 恢复一次告警资格：每次激活至多告警一次。
+        contentElementWarned = false
         const store = createStore()
         const t = ctx.locale.bind(NS)
 
@@ -978,7 +979,7 @@ window.__ModuleLoader__.load({
           const disposeZh = ctx.locale.register(NS, 'zh', DICTS.zh)
           const disposeEn = ctx.locale.register(NS, 'en', DICTS.en)
           return () => { disposeZh(); disposeEn() }
-        }, 'conversation-width: dictionaries')
+        }, 'dsh-widthkeeper: dictionaries')
 
         /** 注册进槽位的组件：store 与翻译由本次 activation 持有。 */
         function Dock() {

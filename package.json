@@ -1,6 +1,6 @@
 {
   "name": "@yulaiz/dsh-widthkeeper",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "会话内容列的守宽人：滑杆、精确输入、自动读值，钉住宽度后可收起控件（DSH Web UI 插件）。",
   "keywords": [
     "deepseek",
