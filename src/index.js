@@ -1,7 +1,7 @@
 /**
- * dsh-widthkeeper bundle 的 Host 半边（分叉自 @jinngoo/dsh-conversation-width 0.1.3）。
+ * dsh-widthkeeper bundle 的 Host 半边（代码基线来自 @jinngoo/dsh-conversation-width 0.1.3，MIT）。
  *
- * 功能全在 Client 半边（`./client.js`，由 package.json 的 `dsh.client` 声明）：它持有
+ * 功能全在 Client 半边（`src/client.js`，由 package.json 的 `dsh.client` 声明）：它持有
  * 一份宽度偏好，投影到 Harness 自己的 `--dsh-chat-content-width` 轴，并在输入框下方
  * 提供一个编辑该偏好的条目。
  *

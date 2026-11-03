@@ -1,3 +1,6 @@
 .DS_Store
 node_modules/
 *.tgz
+
+# JetBrains IDE（本地环境，不入库）
+.idea/

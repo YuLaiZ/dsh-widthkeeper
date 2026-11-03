@@ -1,7 +1,7 @@
 {
   "name": "dsh-widthkeeper",
-  "version": "0.1.0",
-  "description": "会话内容列的守宽人：滑杆、精确输入、自动读值，钉住宽度后收起控件（DSH Web UI 插件）。Fork of @jinngoo/dsh-conversation-width.",
+  "version": "0.2.0",
+  "description": "会话内容列的守宽人：滑杆、精确输入、自动读值，钉住宽度后可收起控件（DSH Web UI 插件）。",
   "keywords": [
     "deepseek",
     "deepseek-harness",
@@ -29,29 +29,30 @@
     "access": "public"
   },
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "exports": {
     ".": {
-      "default": "./index.js"
+      "default": "./src/index.js"
     },
     "./client": {
-      "default": "./client.js"
+      "default": "./src/client.js"
     },
     "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg",
     "./package.json": "./package.json"
   },
   "files": [
-    "index.js",
-    "client.js",
+    "src",
     "cordis.patch.yml",
     "README.md",
     "LICENSE",
-    "icon.svg"
+    "icon.svg",
+    "locale/*.json"
   ],
   "engines": {
     "node": ">=22",
-    "dsh": "^0.2.0-rc.1"
+    "dsh": ">=0.2.0-rc.1"
   },
   "dsh": {
     "bundle": {
@@ -61,7 +62,8 @@
       "platform": "web",
       "immediately": true,
       "inject": [
-        "@deepseek-ai/dsh-client-ui-conversation"
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-settings"
       ]
     }
   }

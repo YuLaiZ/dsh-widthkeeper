@@ -1,15 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Conversation width">
-  <title>Conversation width</title>
-  <g fill="none" stroke="#247bbf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    <!-- 会话内容列 -->
-    <rect x="24" y="8" width="16" height="23" rx="3"/>
-    <!-- 向左右加宽 -->
-    <path d="M22 19 H9"/>
-    <path d="M15 12 L8 19 L15 26"/>
-    <path d="M42 19 H55"/>
-    <path d="M49 12 L56 19 L49 26"/>
-    <!-- 输入框下方的宽度滑杆（把手偏右 = 更宽） -->
-    <path d="M12 47 H52"/>
-    <rect x="34" y="40" width="9" height="14" rx="4.5" fill="#247bbf" stroke="none"/>
+<svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Width keeper">
+  <title>Width keeper</title>
+  <!-- 官方插件美术语言：蓝色渐变圆角方块 + 白色标记（#69B9FF → #324DE2）。
+       标记语义：左右两条边界线夹住双向箭头，表示会话内容列的宽度可向两侧调宽。
+       方块按 28 单位绘制后整体缩到 26/36，与官方插件 artwork 的留白比例一致。 -->
+  <defs>
+    <linearGradient id="widthkeeper_blue" x1="18" y1="4" x2="18" y2="32" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#69B9FF" />
+      <stop offset="1" stop-color="#324DE2" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(18 18) scale(0.9286) translate(-18 -18)">
+    <rect x="4" y="4" width="28" height="28" rx="8" fill="url(#widthkeeper_blue)" />
+    <g stroke="#FFFFFF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 11v14" />
+      <path d="M26 11v14" />
+      <path d="M13 18h10" />
+      <path d="M15.5 15.5 13 18l2.5 2.5" />
+      <path d="M20.5 15.5 23 18l-2.5 2.5" />
+    </g>
   </g>
 </svg>
