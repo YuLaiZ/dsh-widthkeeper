@@ -1,5 +1,7 @@
 # dsh-widthkeeper
 
+GitHub：<https://github.com/YuLaiZ/dsh-widthkeeper>
+
 会话内容列的**守宽人**。给 DeepSeek Harness 的 Web / 桌面客户端一个可以精确控制的会话内容列宽度：输入框下方一根滑杆，钉住宽度后还能收起控件，固定模式下正文两侧那条容易误触的拖拽手柄也会隐藏。
 
 ## 解决的问题
