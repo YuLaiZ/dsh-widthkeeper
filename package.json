@@ -1,16 +1,14 @@
 {
   "name": "@yulaiz/dsh-widthkeeper",
-  "version": "0.2.1",
-  "description": "会话内容列的守宽人：滑杆、精确输入、自动读值，钉住宽度后可收起控件（DSH Web UI 插件）。",
+  "version": "0.2.3",
+  "description": "DeepSeek Harness 的会话宽度插件，支持 Web 版和桌面版。拖动滑杆或输入像素值即可固定主会话的正文宽度，隐藏控件后仍会保留宽度设置。",
   "keywords": [
-    "deepseek",
     "deepseek-harness",
     "dsh",
     "dsh-plugin",
-    "client-plugin",
-    "web-ui",
-    "layout",
-    "width"
+    "conversation-width",
+    "chat-width",
+    "content-width"
   ],
   "license": "MIT",
   "author": "YuLaiZ (https://github.com/YuLaiZ)",
@@ -26,10 +24,12 @@
     "url": "https://github.com/YuLaiZ/dsh-widthkeeper/issues"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "type": "module",
   "main": "src/index.js",
+  "icon": "./icon.svg",
   "exports": {
     ".": {
       "default": "./src/index.js"
@@ -44,15 +44,32 @@
   },
   "files": [
     "src",
+    "locale/*.json",
     "cordis.patch.yml",
-    "README.md",
-    "LICENSE",
     "icon.svg",
-    "locale/*.json"
+    "docs",
+    "README.md",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=22",
-    "dsh": ">=0.2.0-rc.1"
+    "dsh": ">=0.2.0-rc.1 <0.3.0-0"
+  },
+  "scripts": {
+    "check": "node --check src/index.js && node --check src/client.js",
+    "prepack": "npm run check"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-client-ui-primitives": ">=0.2.0-rc.1 <0.3.0-0",
+    "react": "^18.3.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-client-ui-primitives": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
   },
   "dsh": {
     "bundle": {

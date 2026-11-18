@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Width Keeper",
-    "description": "Precise width control, live readout, pin and tuck."
+    "description": "Set the content width of the main conversation with a slider or an exact pixel value. Hide the controls while keeping your width setting."
   }
 }
