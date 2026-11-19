@@ -29,7 +29,7 @@
   },
   "type": "module",
   "main": "src/index.js",
-  "icon": "./icon.svg",
+  "icon": "./icon.png",
   "exports": {
     ".": {
       "default": "./src/index.js"
@@ -39,34 +39,30 @@
     },
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./locale/*.json": "./locale/*.json",
-    "./icon": "./icon.svg",
+    "./icon": "./icon.png",
     "./package.json": "./package.json"
   },
   "files": [
     "src",
     "locale/*.json",
     "cordis.patch.yml",
-    "icon.svg",
+    "icon.png",
     "docs",
     "README.md",
     "LICENSE"
   ],
   "engines": {
     "node": ">=22",
-    "dsh": ">=0.2.0-rc.1 <0.3.0-0"
+    "dsh": ">=0.2.0-rc.1"
   },
   "scripts": {
     "check": "node --check src/index.js && node --check src/client.js",
     "prepack": "npm run check"
   },
   "peerDependencies": {
-    "@deepseek-ai/dsh-client-ui-primitives": ">=0.2.0-rc.1 <0.3.0-0",
     "react": "^18.3.1"
   },
   "peerDependenciesMeta": {
-    "@deepseek-ai/dsh-client-ui-primitives": {
-      "optional": true
-    },
     "react": {
       "optional": true
     }
