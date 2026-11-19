@@ -1,6 +1,6 @@
 {
   "name": "@yulaiz/dsh-widthkeeper",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "DeepSeek Harness 的会话宽度插件，支持 Web 版和桌面版。拖动滑杆或输入像素值即可固定主会话的正文宽度，隐藏控件后仍会保留宽度设置。",
   "keywords": [
     "deepseek-harness",

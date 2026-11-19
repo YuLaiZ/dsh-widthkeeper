@@ -38,6 +38,10 @@ window.__ModuleLoader__.load({
   factory(require) {
     const React = require('react')
     const h = React.createElement
+    let flushSync = null
+    try {
+      flushSync = require('react-dom').flushSync ?? null
+    } catch { /* 旧宿主未暴露 react-dom 时仍由观察器补测。 */ }
 
     /**
      * 宿主的 Tooltip：桌面版 Electron 里原生 `title` 不弹提示（2026-11-02 实测，
@@ -56,6 +60,8 @@ window.__ModuleLoader__.load({
     const DOCK_ID = 'dsh-widthkeeper'
     /** 槽位：输入框卡片下方的环境条目。 */
     const DOCK_SLOT = 'conversation.composer.dock'
+    const DOCK_WAITING_CSS = '[data-composer-dock]:not([data-sidebar-chat] *):has('
+      + '> [data-slot="' + DOCK_SLOT + '"] > [data-widthkeeper-waiting]){visibility:hidden}'
     /** 槽位：设置页分区（宿主插件页 order 为 15，本分区排在其后）。 */
     const SECTION_SLOT = 'settings.section'
     const SECTION_ID = 'widthkeeper'
@@ -555,6 +561,16 @@ window.__ModuleLoader__.load({
       return Number.isFinite(width) && width > 0 ? width : null
     }
 
+    /** 即使聊天视图还在回放历史，宿主滚动区也已经为正文保留了宽度。 */
+    function transcriptSpace(content, scroll) {
+      const clearance = window.getComputedStyle(content)
+        .getPropertyValue('--dsh-composer-side-clearance').trim()
+      if (!/^\d+(?:\.\d+)?px$/.test(clearance)) return null
+      const width = parentContentWidth(scroll)
+      // 宿主正文的两侧各比输入卡片多留 16px。
+      return width === null ? null : Math.max(1, width - 2 * (Number.parseFloat(clearance) + 16))
+    }
+
     /**
      * 滑杆上限，按宿主自己的拖拽口径取：`max(CONTENT_MIN, 列宽 − CONTENT_EDGE_BUDGET)`。
      *
@@ -607,8 +623,12 @@ window.__ModuleLoader__.load({
       const prescribed = preference !== null
         ? Math.round(preference)
         : axisPixels
-      const measured = measuredContentWidth(element, cache)
-      const width = measured ?? axisPixels
+      const scroll = element.querySelector(SCROLL_SELECTOR)
+      const measured = measuredContentWidth(scroll, cache)
+      const available = measured === null && scroll !== null ? transcriptSpace(element, scroll) : null
+      const width = measured ?? (axisPixels !== null && available !== null
+        ? Math.min(axisPixels, available)
+        : axisPixels)
       return {
         width,
         prescribed,
@@ -624,9 +644,7 @@ window.__ModuleLoader__.load({
      * 所以真实宽度 = min(轴值, 可用宽度)。量它自己的矩形即可；
      * 测不到（不可见、0 宽）时返回 null，由调用方回退声明值。
      */
-    function measuredContentWidth(element, cache = null) {
-      // 会话主体是滚动区的**祖先**（body 包住 scrollBody），必须向下找
-      const scroll = element.querySelector(SCROLL_SELECTOR)
+    function measuredContentWidth(scroll, cache = null) {
       if (scroll === null) return null
       /**
        * 拖手柄时每帧都会读一次：缓存正文列引用，命中时只量一次矩形，
@@ -841,10 +859,11 @@ window.__ModuleLoader__.load({
      */
     function useAutoWidth(active, anchorRef, missingContentWarning) {
       const [info, setInfo] = React.useState(null)
-      React.useEffect(() => {
+      React.useLayoutEffect(() => {
         if (!active) return
         let target = null
         let frame = 0
+        let disposed = false
         let resizeObserver = null
         let intersectionObserver = null
         const observedContent = new Set()
@@ -941,9 +960,16 @@ window.__ModuleLoader__.load({
         }
 
         refresh()
+        if (anchorRef && flushSync && target !== null && hostColumnWidth(target) === null) {
+          // 子组件可能先于宿主发布宽度轴。宿主提交结束后再读一次，在绘制前更新滑块。
+          queueMicrotask(() => {
+            if (!disposed) flushSync(refresh)
+          })
+        }
         window.addEventListener('pointerup', schedule)
         document.addEventListener('focusin', schedule)
         return () => {
+          disposed = true
           mutations.disconnect()
           styleObserver.disconnect()
           resizeObserver?.disconnect()
@@ -977,13 +1003,22 @@ window.__ModuleLoader__.load({
         let frame = 0
         let observed = null
         let cached = null
+        let measuredScroll = null
 
         const measure = () => {
           const content = pickContentElement(anchorRef ? anchorRef.current : null)
           const scroll = content === null ? null : content.querySelector(SCROLL_SELECTOR)
+          measuredScroll = null
           if (scroll === null) {
             cached = null
             return FALLBACK_MAX
+          }
+          const available = transcriptSpace(content, scroll)
+          if (available !== null) {
+            // 宿主在 layout effect 发布变量，首次测量直接用它所读取的主体宽度。
+            measuredScroll = scroll
+            cached = null
+            return toPageLimit(available, content.offsetWidth)
           }
           // 缓存的正文列仍属于当前滚动区且可见：只读父元素尺寸
           if (cached !== null
@@ -1031,7 +1066,8 @@ window.__ModuleLoader__.load({
         bind()
         const mutations = observeConversationStructure(
           schedule,
-          (record) => observed !== null && observed.contains(record.target)
+          // 滚动区已提供尺寸时，普通正文节点的增删不影响上限。
+          (record) => observed !== null && observed !== measuredScroll && observed.contains(record.target)
             && (cached === null || !cached.element.isConnected),
         )
         // 会话切换 / dock 重挂后锚点变化；拖动正文手柄时滚动区尺寸不变，
@@ -1491,9 +1527,69 @@ window.__ModuleLoader__.load({
           return () => { disposeZh(); disposeEn() }
         }, 'dsh-widthkeeper: dictionaries')
 
-        /** 注册进槽位的组件：store 与翻译由本次 activation 持有。 */
-        function Dock() {
+        const openedSessions = new Set()
+        const releasedSessions = new Set()
+        function SessionDock({ sessionId, useSession, useChat }) {
+          const { dockVisible } = useStoreState(store)
+          const historyState = useSession(session => session.blank ? undefined : session.openState)
+          const waitingForHistory = !openedSessions.has(sessionId)
+            && (historyState === 'cold' || historyState === 'loading')
+          const awaitingStats = useSession(session => session.blank === false
+            // 历史会话也会在回放前收到 running。等待必须由本地首发线索触发。
+            && (session.promptAttempted === true || session.awaitingFirstTurn === true)
+            && session.promptError == null && session.lastAgentError == null
+            && session.openState !== 'error' && !session.removed)
+          // turnEnds 来自持久化的 turn/end，涵盖完成、中止和失败。已有历史也可以直接显示。
+          const needsFirstTurn = useChat(chat => chat.legacy?.turnEnds?.size === 0
+            && (chat.timeline?.turnOrder?.length ?? 0) <= 1)
+          const [released, setReleased] = React.useState(() => releasedSessions.has(sessionId))
+          const waitingForStats = dockVisible && awaitingStats && needsFirstTurn && !released
+          const anchorRef = React.useRef(null)
+
+          React.useLayoutEffect(() => {
+            // 首次回放时宿主的统计分批出现，已打开的会话切回时直接显示控件。
+            if (historyState === 'open') openedSessions.add(sessionId)
+          }, [historyState, sessionId])
+
+          React.useLayoutEffect(() => {
+            if (!waitingForStats) return
+            const anchor = anchorRef.current
+            const slot = anchor?.closest('[data-slot="' + DOCK_SLOT + '"]')
+            const release = () => {
+              releasedSessions.add(sessionId)
+              setReleased(true)
+            }
+            if (!slot || slot.querySelector('[data-composer-stat]')) {
+              release()
+              return
+            }
+            // 任一统计实际进入当前槽位就放行。紧凑模式和零用量会省略部分统计。
+            const observer = new MutationObserver(() => {
+              if (!slot.querySelector('[data-composer-stat]')) return
+              observer.disconnect()
+              release()
+            })
+            observer.observe(slot, { childList: true, subtree: true })
+            return () => observer.disconnect()
+          }, [waitingForStats, sessionId])
+
+          if (!dockVisible) return null
+          if (waitingForHistory || waitingForStats) {
+            // 保留宿主状态行的布局，避免用量或上下文圆环单独露出。
+            return h(React.Fragment, null,
+              h('style', null, DOCK_WAITING_CSS),
+              h('span', { ref: anchorRef, hidden: true, 'data-widthkeeper-waiting': '' }),
+            )
+          }
           return h(WidthDock, { store, t })
+        }
+
+        function Dock({ sessionId, useSession, useChat }) {
+          // 会话槽位较旧的宿主可能缺少聊天快照，直接提供宽度控件。
+          if (sessionId == null || typeof useSession !== 'function' || typeof useChat !== 'function') {
+            return h(WidthDock, { store, t })
+          }
+          return h(SessionDock, { key: sessionId, sessionId, useSession, useChat })
         }
 
         function Section() {
