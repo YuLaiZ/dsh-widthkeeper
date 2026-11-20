@@ -1,5 +1,7 @@
 # <img src="icon.png" alt="" width="48" height="48" align="absmiddle"> dsh-widthkeeper
 
+[![Awesome DSH Plugin](https://awesome-dsh-plugin.com/badge.svg)](https://awesome-dsh-plugin.com/p/YuLaiZ/dsh-widthkeeper/) [![Listed on dsh-plugin.org](https://dsh-plugin.org/badges/listed.svg)](https://dsh-plugin.org/plugins/yulaiz/dsh-widthkeeper) [![dshfind](https://dshfind.com/api/badge/YuLaiZ/dsh-widthkeeper?lang=zh)](https://dshfind.com/zh/plugins/YuLaiZ/dsh-widthkeeper?ref=badge) [![npm version](https://img.shields.io/npm/v/@yulaiz/dsh-widthkeeper)](https://www.npmjs.com/package/@yulaiz/dsh-widthkeeper) [![npm downloads](https://img.shields.io/npm/dm/@yulaiz/dsh-widthkeeper)](https://www.npmjs.com/package/@yulaiz/dsh-widthkeeper) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
 GitHub：<https://github.com/YuLaiZ/dsh-widthkeeper>
 
 **守宽人**是 DeepSeek Harness 的会话宽度插件，支持 Web 版和桌面版。用滑杆或像素值设置主会话的正文宽度，设好后可以隐藏控件。
